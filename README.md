@@ -1,8 +1,8 @@
 # ESD Level 6 JS/AW
  
 ## Collaborators
-> James Sadler
-> Aidan Willis
+###### James Sadler
+###### Aidan Willis
 
 ## Tasks
 * Create Repository - Done
