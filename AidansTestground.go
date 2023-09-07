@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// Note: Only one main function can exist in a directory. if you want this to work then put it into another folder
 func main() {
 	// Specify the file path
 	filePath := "test.txt"
