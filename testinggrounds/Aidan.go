@@ -6,8 +6,7 @@ import (
 	"os"
 )
 
-// Note: Only one main function can exist in a directory. if you want this to work then put it into another folder like i've done
-func main() {
+func Aidan_read() {
 	// Specify the file path
 	filePath := "test.txt"
 
