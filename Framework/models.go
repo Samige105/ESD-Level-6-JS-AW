@@ -54,7 +54,7 @@ func (a *App) importData() error {
 	// Create table as required, along with attribute constraints
 	sql := `DROP TABLE IF EXISTS "cost";
 	CREATE TABLE "cost" (
-		id INTEGER PRIMARY KEY NOT NULL,
+		id SERIAL PRIMARY KEY NOT NULL,
 		electric_amount INTEGER,
 		electric_price INTEGER,
 		water_amount INTEGER,
