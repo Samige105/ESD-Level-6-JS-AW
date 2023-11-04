@@ -19,3 +19,7 @@
 
 # Go workspace file
 go.work
+
+# program Start file
+start.bat
+start.bat
