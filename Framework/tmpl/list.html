@@ -44,7 +44,7 @@
             <tr>
                 <th>Index</th>
                 <th><a href="/list/0">Id</a></th>
-                <th><a href="/list/2">Electric Amount(KW)</a></th>
+                <th><a href="/list/2">Days </a></th>
                 <th>Electric Price(VND)</th>
                 <th><a href="/list/3">Water Amount(M<sup>3</sup>)</a></th>
                 <th>Water Price(VND)</th>
@@ -64,7 +64,8 @@
                 <td>{{multiplication $cost.WaterPrice 1000}}</td>
                 <td>{{$cost.CheckedDate}}</td>
                 <td>
-                    <button class="w3-btn w3-teal" onclick="updateCost(this);">Modify</button>
+                    <button class="w3-btn w3-teal" onclick="updateCost(this);">Edit</button>
+                    <button class="w3-btn w3-yellow" onclick="ReadCost(this);">Read</button>
                     <button class="w3-btn w3-red" onclick="deleteCost(this)">Delete</button>
                 </td>
             </tr>
@@ -80,7 +81,7 @@
         <div class="w3-modal-content w3-card-8 w3-animate-zoom" style="max-width: 600px;">
             <!-- head -->
             <div class="w3-container w3-teal">
-                <h2>Create new cost</h2>
+                <h2>Create new Note</h2>
                 <span class="w3-closebtn w3-hover-red w3-container w3-padding-8 w3-display-topright"
                       onclick="document.getElementById('create-form').style.display='none'">&times;</span>
             </div>
@@ -169,9 +170,16 @@
 
   function deleteCost(e) {
     var deleteForm = document.getElementById('delete-form');
+    // this opens a form up to show if you want to delet it
     deleteForm.style.display = 'block';
+    // this make the id and whole form delet the selected  
     var costId = e.parentNode.parentNode.childNodes[3].innerText;
     document.getElementById('costIdToDelete').value = costId;
+  }
+  function viewnotes(e){
+    var VeiwForm = document.getElementById('Viewnote');
+    viewForm.style.display = 'block';
+
   }
 </script>
 </body>
