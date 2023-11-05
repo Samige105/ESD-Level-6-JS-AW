@@ -22,6 +22,10 @@
 <!--The body of the html code-->
 <body>
 <div class="w3-row-padding">
+	<form method="POST">
+		<input id="searchtext" type="text" class="w3-left">
+		<input id="submitBtn" type="submit" onclick="search()">
+	</form>
 	<div class="w3-card-2 w3-margin-top">
 		<header class="w3-container w3-center w3-teal">
 			<div class="w3-row">
@@ -176,6 +180,21 @@
 		deleteForm.style.display = 'block';
 		var Id = e.parentNode.parentNode.childNodes[3].innerText;
 		document.getElementById('noteIdToDelete').value = Id;
+	}
+
+	function search() {
+		var xmlhttp;
+		var searchtext = document.getElementById("searchtext").value
+    	xmlhttp=new XMLHttpRequest();
+    	xmlhttp.onreadystatechange=function()
+    	{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+			    document.getElementById("searchtext")
+			}
+    	}
+    	xmlhttp.open("POST","post",true);
+    	xmlhttp.send(searchtext);
 	}
 </script>
 </body>

@@ -113,6 +113,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/create", a.createHandler).Methods("POST", "GET")
 	a.Router.HandleFunc("/update", a.updateHandler).Methods("POST", "GET")
 	a.Router.HandleFunc("/delete", a.deleteHandler).Methods("POST", "GET")
+	a.Router.HandleFunc("/post", PostHandler)
 
 	log.Println("Routes established")
 }
