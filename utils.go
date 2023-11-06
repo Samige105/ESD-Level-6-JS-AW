@@ -8,12 +8,14 @@ import (
 )
 
 func checkInternalServerError(err error, w http.ResponseWriter) {
+	// Check for any server issues
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
+// Unused functions for error handling
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})
 }

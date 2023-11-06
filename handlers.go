@@ -34,7 +34,7 @@ func (a *App) notesHandler(w http.ResponseWriter, r *http.Request) {
 	checkInternalServerError(err, w)
 	err = t.Execute(w, data)
 	checkInternalServerError(err, w)
-	http.Redirect(w, r, "/notes", 301)
+	http.Redirect(w, r, "/notes", http.StatusMovedPermanently)
 }
 
 func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,10 +107,10 @@ func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
 func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 
-	var notes Notes
+	var notes Notes // Prepare the note to be added into the database
 	notes.Title = r.FormValue("Title")
 	notes.DateCreated = r.FormValue("DateCreated")
 	notes.DateEdited = r.FormValue("DateEdited")
@@ -134,16 +134,16 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		checkInternalServerError(err, w)
 	}
 
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
 func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 
-	var notes Notes
+	var notes Notes // Updating notes
 	notes.Id, _ = strconv.Atoi(r.FormValue("Id"))
 	notes.Title = r.FormValue("Title")
 	notes.DateCreated = r.FormValue("DateCreated")
@@ -161,14 +161,15 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	checkInternalServerError(err, w)
 	_, err = res.RowsAffected()
 	checkInternalServerError(err, w)
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 
 }
 
 func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Deleting notes from database
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 	var notesId, _ = strconv.ParseInt(r.FormValue("Id"), 10, 64)
 	stmt, err := a.db.Prepare("DELETE FROM notes WHERE id=$1")
@@ -177,11 +178,12 @@ func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	checkInternalServerError(err, w)
 	_, err = res.RowsAffected()
 	checkInternalServerError(err, w)
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 
 }
 
 func (a *App) indexHandler(w http.ResponseWriter, r *http.Request) {
+	// Loading notes
 	a.isAuthenticated(w, r)
-	http.Redirect(w, r, "/list", 301)
+	http.Redirect(w, r, "/list", http.StatusMovedPermanently)
 }

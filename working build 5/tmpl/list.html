@@ -88,8 +88,8 @@
 			</div>
 
 			<form class="w3-container" action="/create" method="post"><br>
-				<input class="w3-input" type="string" name="Title" placeholder="Note Title">
-				<textarea class="w3-input" id="w3-input" type="string" name="Contents" placeholder="Enter Notes Here" rows="10" cols="62"></textarea><!--this is to make the form look better-->
+				<input class="w3-input" type="string" name="Title" placeholder="Note Title" value="">
+				<textarea class="w3-input" id="w3-input" type="string" name="Contents" placeholder="Enter Notes Here" rows="10" cols="62" value=""></textarea><!--this is to make the form look better-->
 				<button class="w3-btn w3-teal w3-margin-top w3-margin-bottom w3-right" type="submit">Add</button>
 			</form>
 		</div>
@@ -146,30 +146,30 @@
 
 <script>
 	function opennote(e) {
-    var editForm = document.getElementById('edit-form');
-    // Display update form
-    editForm.style.display = 'block';
+    	var editForm = document.getElementById('edit-form');
+    	// Display update form
+    	editForm.style.display = 'block';
 
-    // Get note details from the row
-    var Id = e.parentNode.parentNode.childNodes[1].textContent;
-    var Title = e.parentNode.parentNode.childNodes[3].textContent;
-    var DateCreated = e.parentNode.parentNode.childNodes[5].textContent;
-    var Contents = e.parentNode.parentNode.childNodes[11].textContent;
-	
-        /*
-		for(let i=0;i<12;i++) {
-            console.log(i)
-            console.log(e.parentNode.parentNode.childNodes[i].innerText)
-        }
-		*/
-        
+    	// Get note details from the row
+    	var Id = e.parentNode.parentNode.childNodes[1].textContent;
+    	var Title = e.parentNode.parentNode.childNodes[3].textContent;
+    	var DateCreated = e.parentNode.parentNode.childNodes[5].textContent;
+    	var Contents = e.parentNode.parentNode.childNodes[11].textContent;
+		
+    	    /*
+			for(let i=0;i<12;i++) {
+    	        console.log(i)
+    	        console.log(e.parentNode.parentNode.childNodes[i].innerText)
+    	    }
+			*/
+		
 
-    // Set the values in the form
-    document.getElementById('noteIdToUpdate').value = Id;
-    document.getElementById('noteTitleToUpdate').value = Title;
-    document.getElementById('noteDateToUpdate').value = DateCreated;
-    document.getElementById('noteContents').value = Contents;
-}
+    	// Set the values in the form
+    	document.getElementById('noteIdToUpdate').value = Id;
+    	document.getElementById('noteTitleToUpdate').value = Title;
+    	document.getElementById('noteDateToUpdate').value = DateCreated;
+    	document.getElementById('noteContents').value = Contents;
+	}
 
 
 	function deleteCost(e) {
@@ -178,12 +178,6 @@
 		var Id = e.parentNode.parentNode.childNodes[3].innerText;
 		document.getElementById('noteIdToDelete').value = Id;
 	}
-	
-    document.querySelector('form').addEventListener('submit', function (e) {
-        e.preventDefault();  // Prevent the form from submitting via a full page reload
-        var title = document.querySelector('input[name="Title"]').value;
-        document.getElementById('submittedTitle').textContent = 'Submitted Title: ' + title;
-    });
 </script>
 </body>
 </html>

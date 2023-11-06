@@ -24,6 +24,7 @@ type User struct {
 }
 
 func readData(fileName string) ([][]string, error) {
+	// Open and read a csv file for appending data to the database
 	f, err := os.Open(fileName)
 
 	if err != nil {
