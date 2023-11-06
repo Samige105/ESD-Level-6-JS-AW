@@ -114,7 +114,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/create", a.createHandler).Methods("POST", "GET")
 	a.Router.HandleFunc("/update", a.updateHandler).Methods("POST", "GET")
 	a.Router.HandleFunc("/delete", a.deleteHandler).Methods("POST", "GET")
-	a.Router.HandleFunc("/post", PostHandler).Methods("POST", "GET")
+	a.Router.HandleFunc("/search", a.searchHandler).Methods("POST", "GET")
 
 	log.Println("Routes established")
 }
