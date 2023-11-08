@@ -40,6 +40,7 @@ func (a *App) registerHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 	}
+	http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 }
 
 func (a *App) loginHandler(w http.ResponseWriter, r *http.Request) {

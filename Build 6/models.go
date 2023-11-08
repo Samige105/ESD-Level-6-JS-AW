@@ -8,12 +8,13 @@ import (
 )
 
 type Notes struct {
-	Id          int    `json:"id"`
-	Title       string `json:"note_title"`
-	DateCreated string `json:"date_created"`
-	DateEdited  string `json:"date_edited"`
-	SizeBytes   int    `json:"size_bytes"`
-	Contents    string `json:"note_contents"`
+	Id              int    `json:"id"`
+	Title           string `json:"note_title"`
+	DateCreated     string `json:"date_created"`
+	DateEdited      string `json:"date_edited"`
+	SizeBytes       int    `json:"size_bytes"`
+	DisplayContents string `json:"note_display"`
+	Contents        string `json:"note_contents"`
 }
 
 type User struct {
@@ -59,7 +60,8 @@ func (a *App) importData() error {
 		date_created DATE,
 		date_edited DATE,
 		size_bytes INTEGER,
-		note_contents VARCHAR(65000) NOT NULL
+		note_display VARCHAR(20) NOT NULL,
+		note_contents VARCHAR(10485760) NOT NULL
 	);`
 	_, err := a.db.Exec(sql)
 	if err != nil {
@@ -84,7 +86,7 @@ func (a *App) importData() error {
 	log.Printf("Inserting data...")
 
 	//prepare the cost insert query
-	stmt, err := a.db.Prepare("INSERT INTO notes VALUES($1,$2,$3,$4,$5,$6)")
+	stmt, err := a.db.Prepare("INSERT INTO notes VALUES($1,$2,$3,$4,$5,$6,$7)")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -104,9 +106,10 @@ func (a *App) importData() error {
 		c.DateCreated = data[2]
 		c.DateEdited = data[3]
 		c.SizeBytes, _ = strconv.Atoi(data[4])
-		c.Contents = data[5]
+		c.DisplayContents = data[5]
+		c.Contents = data[6]
 
-		_, err := stmt.Exec(c.Id-1, c.Title, c.DateCreated, c.DateEdited, c.SizeBytes, c.Contents)
+		_, err := stmt.Exec(c.Id-1, c.Title, c.DateCreated, c.DateEdited, c.SizeBytes, c.DisplayContents, c.Contents)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -132,7 +135,7 @@ func (a *App) importData() error {
 		u.Username = data[1]
 		u.Password = data[2]
 		u.Role, _ = strconv.Atoi(data[3])
-		_, err := stmt.Exec(u.Id, u.Username, u.Password, u.Role)
+		_, err := stmt.Exec(u.Id-1, u.Username, u.Password, u.Role)
 
 		if err != nil {
 			log.Fatal(err)

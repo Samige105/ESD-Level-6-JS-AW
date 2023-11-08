@@ -50,7 +50,8 @@
 				<th><a href="/list/2">Date Created</a></th>
 				<th><a href="/list/3">Date Last Edited</a></th>
 				<th><a href="/list/4">Character</a></th>
-				<th>Note Contents</th>
+				<th>Note Display</th>
+				<!--<th>Note Contents</th>-->
 				<th>Actions</th>
 			</tr>
 			</thead>
@@ -63,7 +64,8 @@
 				<td>{{$notes.DateCreated}}</td>
 				<td>{{$notes.DateEdited}}</td>
 				<td>{{$notes.SizeBytes}}</td>
-				<td>{{$notes.Contents}}</td>
+				<td>{{$notes.DisplayContents}}</td>
+				<td style="display:none;">{{$notes.Contents}}</td>
 				<!--This is the open popup menu-->
 				<td>
 					<button class="w3-btn w3-teal" onclick="opennote(this);">Edit</button>
@@ -154,10 +156,10 @@
     	var Id = e.parentNode.parentNode.childNodes[1].textContent;
     	var Title = e.parentNode.parentNode.childNodes[3].textContent;
     	var DateCreated = e.parentNode.parentNode.childNodes[5].textContent;
-    	var Contents = e.parentNode.parentNode.childNodes[11].textContent;
+    	var Contents = e.parentNode.parentNode.childNodes[13].textContent;
 	
         /*
-		for(let i=0;i<12;i++) {
+		for(let i=0;i<15;i++) {
             console.log(i)
             console.log(e.parentNode.parentNode.childNodes[i].innerText)
         }

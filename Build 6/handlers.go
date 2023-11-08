@@ -97,8 +97,9 @@ func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
 	var notes Notes
 	for rows.Next() {
 		err = rows.Scan(&notes.Id, &notes.Title,
-			&notes.DateCreated, &notes.DateEdited, &notes.SizeBytes, &notes.Contents)
+			&notes.DateCreated, &notes.DateEdited, &notes.SizeBytes, &notes.DisplayContents, &notes.Contents)
 		checkInternalServerError(err, w)
+		notes.DisplayContents = truncateText(notes.Contents, 20)
 		data.NotesArray = append(data.NotesArray, notes)
 	}
 	t, err := template.New("list.html").Funcs(funcMap).ParseFiles("tmpl/list.html")
@@ -141,12 +142,13 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	notes.DateCreated = cTime
 	notes.DateEdited = cTime
 	notes.SizeBytes = bytesizes
+	notes.DisplayContents = truncateText(r.FormValue("Contents"), 20)
 	notes.Contents = r.FormValue("Contents")
 
 	// Save to database
 	stmt, err := a.db.Prepare(`
-		INSERT INTO notes(id, note_title, date_created, date_edited, size_bytes, note_contents)
-		VALUES($1, $2, $3, $4, $5, $6)
+		INSERT INTO notes(id, note_title, date_created, date_edited, size_bytes, note_display, note_contents)
+		VALUES($1, $2, $3, $4, $5, $6, $7)
 	`)
 	if err != nil {
 		log.Printf("Prepare query error")
@@ -155,7 +157,7 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(notes.Id, notes.Title, notes.DateCreated,
-		notes.DateEdited, notes.SizeBytes, notes.Contents)
+		notes.DateEdited, notes.SizeBytes, notes.DisplayContents, notes.Contents)
 	if err != nil {
 		log.Printf("Execute query error")
 		checkInternalServerError(err, w)
@@ -181,10 +183,11 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	notes.DateCreated = r.FormValue("DateCreated")
 	notes.DateEdited = cTime
 	notes.SizeBytes = bytesizes
+	notes.DisplayContents = truncateText(r.FormValue("Contents"), 20)
 	notes.Contents = r.FormValue("Contents")
 	stmt, err := a.db.Prepare(`
-		UPDATE notes SET note_title=$1, date_created=$2, date_edited=$3, size_bytes=$4, note_contents=$5
-		WHERE id=$6
+		UPDATE notes SET note_title=$1, date_created=$2, date_edited=$3, size_bytes=$4, note_display=$5, note_contents=$6
+		WHERE id=$7
 	`)
 	if err != nil {
 		log.Fatal(err)
@@ -193,7 +196,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 
 	checkInternalServerError(err, w)
 	res, err := stmt.Exec(notes.Title, notes.DateCreated,
-		notes.DateEdited, notes.SizeBytes, notes.Contents, notes.Id)
+		notes.DateEdited, notes.SizeBytes, notes.DisplayContents, notes.Contents, notes.Id)
 	checkInternalServerError(err, w)
 	_, err = res.RowsAffected()
 	checkInternalServerError(err, w)
