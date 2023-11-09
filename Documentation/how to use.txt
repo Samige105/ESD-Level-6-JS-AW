@@ -1,0 +1,10 @@
+Requirements:
+-Postgres
+-Golang
+
+Before starting the app:
+-In Postgres create a database with the name 'ESD' (Case sensitive)
+
+To start the app either use coderunner or make a batch file with the following command:
+start cmd /k "go run app.go auth.go handlers.go main.go models.go utils.go"
+
