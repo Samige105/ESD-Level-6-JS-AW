@@ -1,1 +1,0 @@
-Added a folder to test stuff while not braking the applaction and will test the files so no errors or mager brakes
