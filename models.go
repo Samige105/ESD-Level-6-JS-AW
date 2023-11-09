@@ -7,6 +7,7 @@ import (
 	"strconv"
 )
 
+// structures for tables to get data
 type Notes struct {
 	Id              int    `json:"id"`
 	Title           string `json:"note_title"`
@@ -17,6 +18,7 @@ type Notes struct {
 	Contents        string `json:"note_contents"`
 }
 
+// user structer
 type User struct {
 	Id          int    `json:"id"`
 	Username    string `json:"username"`
@@ -70,7 +72,7 @@ func (a *App) importData() error {
 		log.Fatal(err)
 	}
 	log.Printf("Table notes table created.")
-
+	// Create a Table for the notes
 	sql = `DROP TABLE IF EXISTS "users";
 	CREATE TABLE "users" (
 		id SERIAL PRIMARY KEY NOT NULL,

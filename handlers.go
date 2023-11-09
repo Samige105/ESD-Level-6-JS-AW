@@ -21,6 +21,7 @@ type pwrData struct {
 	//SearchNotesArray []Notes
 }
 
+// dead function
 func (a *App) notesHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Method %s", r.Method)
 	//if r.Method != "POST" {
@@ -43,6 +44,7 @@ func (a *App) notesHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/notes", http.StatusMovedPermanently)
 }
 
+// this sends the notes to the web page list
 func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println("bozo 1")
 	a.isAuthenticated(w, r)
@@ -118,7 +120,7 @@ func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
 	data := pwrData{}
 	data.Username = user
 	//fmt.Println("bozo 6")
-
+	// sends the note data into the web page
 	var notes Notes
 	for rows.Next() {
 		err = rows.Scan(&notes.Id, &notes.Title,
@@ -131,11 +133,13 @@ func (a *App) listHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	t, err := template.New("list.html").Funcs(funcMap).ParseFiles("tmpl/list.html")
+	// Remakes the webpage with the new list of notes
 	checkInternalServerError(err, w)
 	err = t.Execute(w, data)
 	checkInternalServerError(err, w)
 }
 
+// crates a new note and puts the data into the table
 func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
@@ -147,7 +151,7 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	SQL = "SELECT * FROM notes"
 	rows, err := a.db.Query(SQL)
 	checkInternalServerError(err, w)
-
+	//makes it so that the that the notes are all create with the right id
 	var rowEnum = 0
 	for rows.Next() {
 		var outID int
@@ -161,9 +165,11 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		rowEnum += 1
 	}
 	t := time.Now()
+	//makes it so that it does the date when crated a note
 	var cTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
 	var bytesizes = len([]rune(r.FormValue("Contents")))
 
+	//A tepmariry container for notes
 	var notes Notes
 	notes.Id = rowEnum
 	notes.Title = r.FormValue("Title")
@@ -182,6 +188,7 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Prepare query error")
 		checkInternalServerError(err, w)
 	}
+	//allows cleanup of a.db.Prepare() (prevents meromory leak)
 	defer stmt.Close()
 
 	_, err = stmt.Exec(notes.Id, notes.Title, notes.DateCreated,
@@ -196,7 +203,7 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	SQL = "SELECT * FROM users"
 	rows, err = a.db.Query(SQL)
 	checkInternalServerError(err, w)
-
+	//
 	var userData User
 	for rows.Next() {
 		err = rows.Scan(&userData.Id, &userData.Username,
@@ -210,9 +217,11 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 				UPDATE users SET user_notes=$1
 				WHERE id=$2
 			`)
+			//error check
 			if err != nil {
 				log.Fatal(err)
 			}
+			//allows cleanup of a.db.Prepare() (prevents meromory leak)
 			defer stmt.Close()
 
 			checkInternalServerError(err, w)
@@ -226,7 +235,9 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
+// makes it so when you edit a note it updates
 func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
+	// Updates the page with new information when called
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
@@ -236,8 +247,8 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	t := time.Now()
 	var cTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
 	var bytesizes = len([]rune(r.FormValue("Contents")))
-
-	var notes Notes
+	//changes the vaules
+	var notes Notes // Prepares a structure for holding new note information
 	notes.Id, _ = strconv.Atoi(r.FormValue("Id"))
 	notes.Title = r.FormValue("Title")
 	notes.DateCreated = r.FormValue("DateCreated")
@@ -252,6 +263,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//allows cleanup of a.db.Prepare() (prevents meromory leak)
 	defer stmt.Close()
 
 	checkInternalServerError(err, w)
@@ -263,6 +275,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
+// the abilty to make it so that you can share a note with a user
 func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
@@ -293,6 +306,7 @@ func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal(err)
 			}
+			//allows cleanup of a.db.Prepare() (prevents meromory leak)
 			defer stmt.Close()
 
 			checkInternalServerError(err, w)
@@ -305,6 +319,7 @@ func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusMovedPermanently)
 }
 
+// the abilty to use the serch bar to find notes
 func (a *App) searchHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
@@ -371,17 +386,19 @@ func (a *App) searchHandler(w http.ResponseWriter, r *http.Request) {
 	checkInternalServerError(err, w)
 }
 
+// delete note in the database
 func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 	var notesId, _ = strconv.Atoi(r.FormValue("Id"))
-	stmt, err := a.db.Prepare("DELETE FROM notes WHERE id=$1")
+	stmt, err := a.db.Prepare("DELETE FROM notes WHERE id=$1") //tels the databse where to delete from
 	if err != nil {
 		log.Printf("Prepare delete error")
 		checkInternalServerError(err, w)
 	}
+	//allows cleanup of a.db.Prepare() (prevents meromory leak)
 	defer stmt.Close()
 	res, err := stmt.Exec(notesId)
 	checkInternalServerError(err, w)
@@ -407,6 +424,7 @@ func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		//allows cleanup of a.db.Prepare() (prevents meromory leak)
 		defer stmt.Close()
 		checkInternalServerError(err, w)
 		res, err := stmt.Exec(integers, userData.Id)
@@ -415,11 +433,13 @@ func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		checkInternalServerError(err, w)
 	}
 
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently) // Refresh the page when note is deleted to show that it was deleted successfully
 
 }
 
+// goes to the Router
 func (a *App) indexHandler(w http.ResponseWriter, r *http.Request) {
+	// Load the list page when user logs in
 	a.isAuthenticated(w, r)
 	http.Redirect(w, r, "/list", http.StatusMovedPermanently)
 }

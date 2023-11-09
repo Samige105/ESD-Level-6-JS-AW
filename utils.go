@@ -12,6 +12,7 @@ import (
 )
 
 func checkInternalServerError(err error, w http.ResponseWriter) {
+	// Global function to check for any back-end issues
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -45,6 +46,7 @@ func truncateText(s string, max int) string {
 	if len(s) <= max {
 		return s
 	}
+	// Cuts 20 characters out of the note for display purposes, makes the page look a little nicer with longer notes
 	if len(s) > max {
 		max = max - 3
 		s = s[:max] + "..."
