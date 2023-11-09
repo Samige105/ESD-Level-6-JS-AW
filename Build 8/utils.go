@@ -8,22 +8,11 @@ import (
 )
 
 func checkInternalServerError(err error, w http.ResponseWriter) {
+	// Global function to check for any back-end issues
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-}
-
-func respondWithError(w http.ResponseWriter, code int, message string) {
-	respondWithJSON(w, code, map[string]string{"error": message})
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(payload)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
 }
 
 // used to auto detect the active local IP address - not used yet
@@ -38,6 +27,7 @@ func GetOutboundIP() string {
 }
 
 func truncateText(s string, max int) string {
+	// Cuts 20 characters out of the note for display purposes, makes the page look a little nicer with longer notes
 	if len(s) <= max {
 		return s
 	}
@@ -49,6 +39,7 @@ func truncateText(s string, max int) string {
 	return s[:max]
 }
 
+// Unused functions. Not exactly sure what they do.
 func stringInSlice[T comparable](a T, array []T) bool {
 	for _, b := range array {
 		if b == a {
@@ -56,4 +47,16 @@ func stringInSlice[T comparable](a T, array []T) bool {
 		}
 	}
 	return false
+}
+
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	respondWithJSON(w, code, map[string]string{"error": message})
+}
+
+func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
 }

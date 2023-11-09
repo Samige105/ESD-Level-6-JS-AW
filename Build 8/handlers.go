@@ -170,6 +170,7 @@ func (a *App) createHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
+	// Updates the page with new information when called
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
@@ -180,7 +181,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	var cTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
 	var bytesizes = len([]rune(r.FormValue("Contents")))
 
-	var notes Notes
+	var notes Notes // Prepares a structure for holding new note information
 	notes.Id, _ = strconv.Atoi(r.FormValue("Id"))
 	notes.Title = r.FormValue("Title")
 	notes.DateCreated = r.FormValue("DateCreated")
@@ -207,7 +208,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 	//####################//
 
 	SQL := "SELECT * FROM users"
-	rows, err := a.db.Query(SQL)
+	rows, err := a.db.Query(SQL) // Finds all users in database
 	checkInternalServerError(err, w)
 
 	var userArray []User
@@ -220,7 +221,7 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 		userArray = append(userArray, userData)
 	}
 	for id, user := range userArray {
-		if user.Username == a.username {
+		if user.Username == a.username { // Find all of the users notes
 			userArray[id].Notes = append(user.Notes, notes.Id)
 			stmt, err := a.db.Prepare(`
 				UPDATE users SET notes=$1
@@ -244,13 +245,14 @@ func (a *App) updateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
+	// Sharing notes between users
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 
 	var noteId int
-	noteId, _ = strconv.Atoi(r.FormValue("noteIdToShare"))
+	noteId, _ = strconv.Atoi(r.FormValue("noteIdToShare")) // Get the required values
 	var shareUser = r.FormValue("shareBox")
 
 	fmt.Println(user)
@@ -261,7 +263,7 @@ func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 
 	var userArray []User
 	var userData User
-	for rows.Next() {
+	for rows.Next() { // Check all user data to make sure that the correct user is getting the note shared
 		err = rows.Scan(&userData.Id, &userData.Username,
 			&userData.Password, &userData.Role, &userData.Notes)
 		checkInternalServerError(err, w)
@@ -270,7 +272,7 @@ func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for id, user := range userArray {
-		if user.Username == shareUser {
+		if user.Username == shareUser { // If the user being shared to is correct then add the noteID to them
 			userArray[id].Notes = append(user.Notes, noteId)
 			stmt, err := a.db.Prepare(`
 				UPDATE users SET notes=$1
@@ -293,6 +295,7 @@ func (a *App) shareHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) searchHandler(w http.ResponseWriter, r *http.Request) {
+	// This function deals with finding notes with the title of whatever the user searches for
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
@@ -300,14 +303,14 @@ func (a *App) searchHandler(w http.ResponseWriter, r *http.Request) {
 
 	//fmt.Println("search")
 
-	var search = r.FormValue("SearchBar")
+	var search = r.FormValue("SearchBar") // Get the value of the search bar
 
-	data := pwrData{}
+	data := pwrData{} // Create a structure for the search to have all required information
 
 	var funcMap = template.FuncMap{}
 
 	//fmt.Println(search)
-	if search == "" {
+	if search == "" { // If search is blank, redirect back to the main page
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 
@@ -315,37 +318,37 @@ func (a *App) searchHandler(w http.ResponseWriter, r *http.Request) {
 		data.NotesArray = nil
 
 		SQL := "SELECT * FROM notes"
-		rows, err := a.db.Query(SQL)
+		rows, err := a.db.Query(SQL) // Run SQL command to get all notes
 		checkInternalServerError(err, w)
 
 		var notes Notes
-		for rows.Next() {
+		for rows.Next() { // Go through every note and check for the user's input
 			err = rows.Scan(&notes.Id, &notes.Title,
 				&notes.DateCreated, &notes.DateEdited, &notes.SizeBytes, &notes.DisplayContents, &notes.Contents)
 			checkInternalServerError(err, w)
 
 			if strings.Contains(notes.Contents, search) || strings.Contains(notes.Title, search) {
-				data.NotesArray = append(data.NotesArray, notes)
+				data.NotesArray = append(data.NotesArray, notes) // Finding specific notes with the user's input
 			}
 		}
-
-		data.lastSearch = search
+		data.lastSearch = search // Adds to temporary memory what the last search command was
 	}
 
-	t, err := template.New("list.html").Funcs(funcMap).ParseFiles("tmpl/list.html")
+	t, err := template.New("list.html").Funcs(funcMap).ParseFiles("tmpl/list.html") // Remakes the webpage with the new list of notes
 	checkInternalServerError(err, w)
 	err = t.Execute(w, data)
 	checkInternalServerError(err, w)
 }
 
 func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	// Deals with deleting notes. This is so the correct note gets deleted instead of the first note
 	a.isAuthenticated(w, r)
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
-	var notesId, _ = strconv.ParseInt(r.FormValue("Id"), 10, 64)
+	var notesId, _ = strconv.ParseInt(r.FormValue("Id"), 10, 64) // Get the ID of the note that needs to be deleted
 	stmt, err := a.db.Prepare("DELETE FROM notes WHERE id=$1")
-	if err != nil {
+	if err != nil { // If something happens check the database connection
 		log.Printf("Prepare delete error")
 		checkInternalServerError(err, w)
 	}
@@ -354,11 +357,12 @@ func (a *App) deleteHandler(w http.ResponseWriter, r *http.Request) {
 	checkInternalServerError(err, w)
 	_, err = res.RowsAffected()
 	checkInternalServerError(err, w)
-	http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/", http.StatusMovedPermanently) // Refresh the page when note is deleted to show that it was deleted successfully
 
 }
 
 func (a *App) indexHandler(w http.ResponseWriter, r *http.Request) {
+	// Load the list page when user logs in
 	a.isAuthenticated(w, r)
 	http.Redirect(w, r, "/list", http.StatusMovedPermanently)
 }
